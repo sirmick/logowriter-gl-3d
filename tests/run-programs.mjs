@@ -1,12 +1,13 @@
 // Compiles and runs every playlist program headless, with rendering stubbed out.
 // Reports segment count, peak turtle count, approximate run time at screensaver speed, and 3D bounds.
-import fs from 'fs';
-const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const core=html.split('//<core3d>')[1].split('//</core3d>')[0];
-const stub=`const GL={total:0,bb:[],seg(x0,y0,z0,x1,y1,z1){this.total++;const b=this.bb;for(const p of [[x0,y0,z0],[x1,y1,z1]])for(let k=0;k<3;k++){if(!(p[k]>=b[k]))b[k]=p[k];if(!(p[k]<=b[k+3]))b[k+3]=p[k]}},clear(){this.total=0;this.bb=[]}};`;
-const X=new Function(stub+core+'return {R,GL,PROGRAMS,resetWorld,loadProgram,startTask,step}')();
-const {R,GL}=X;let fail=0;
-for(const p of X.PROGRAMS){
+import {internals,PROGRAMS} from '../logowriter3d.js';
+const {PROGRAM_DEFS,createRuntime}=internals;
+const GL={total:0,bb:[],seg(x0,y0,z0,x1,y1,z1){this.total++;const b=this.bb;for(const p of [[x0,y0,z0],[x1,y1,z1]])for(let k=0;k<3;k++){if(!(p[k]>=b[k]))b[k]=p[k];if(!(p[k]<=b[k+3]))b[k+3]=p[k]}},clear(){this.total=0;this.bb=[]}};
+const X=createRuntime(GL);
+const {R}=X;let fail=0;
+const ids=new Set(PROGRAMS.map(p=>p.id));
+if(ids.size!==PROGRAMS.length||![...ids].every(id=>/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id))){console.log('ERROR program ids are not unique kebab-case');fail++}
+for(const p of PROGRAM_DEFS){
   try{
     X.resetWorld();X.loadProgram(p.src);X.startTask('STARTUP');
     let frames=0,maxT=0;const b=Math.max(1,Math.floor(p.speed));
