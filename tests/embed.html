@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>logowriter3d.js embed test</title>
+<style>
+/* A host page with its own styles: the mounts must not change these. */
+body{margin:16px;background:#223;font:14px sans-serif;color:#ccd}
+.slot{width:640px;height:360px;margin:0 0 12px;outline:1px solid #556}
+</style>
+<script>window.__keys0=Object.keys(window)</script>
+</head>
+<body>
+<p>Driven by <code>tests/embed_check.py</code>.</p>
+<div class="slot" id="a"></div>
+<div class="slot" id="b"></div>
+<script type="module">
+import * as LW from '../logowriter3d.js';
+window.LW=LW;
+window.__importLeaks=Object.keys(window).filter(k=>!window.__keys0.includes(k)&&k!=='LW'&&k!=='__keys0');
+window.__ready=true;
+</script>
+</body>
+</html>
